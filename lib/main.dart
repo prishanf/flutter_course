@@ -20,13 +20,17 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text("My First App"),
+          title: Text("My First App1"),
         ),
         body: Column(children: <Widget>[
           Container(
             margin: EdgeInsets.all(10.0),
             child: RaisedButton(
-              onPressed: () {},
+              onPressed: () {
+                setState(() {
+                  _products.add('Advanced food');                  
+                });
+              },
               child: Text('Add Product'),
             ),
           ),
