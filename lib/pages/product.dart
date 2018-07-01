@@ -7,7 +7,17 @@ class ProductPage extends StatelessWidget {
       appBar: AppBar(
         title: Text("Product Details"),
       ),
-      body: Center(child: Text("On the Product Page"),),
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            Text("On the Product Page"),
+            RaisedButton(
+              child: Text('Back'),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
