@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+
 import './pages/product.dart';
 
 class Products extends StatelessWidget {
   final List<Map<String, String>> products;
   final Function deleteProduct;
 
-  Products(this.products,{this.deleteProduct});
+  Products(this.products, {this.deleteProduct}) {
+    print('[Products Widget] Constructor');
+  }
 
   Widget _buildProductItem(BuildContext context, int index) {
     return Card(
@@ -18,16 +21,11 @@ class Products extends StatelessWidget {
             children: <Widget>[
               FlatButton(
                 child: Text('Details'),
-                onPressed: () => Navigator.push<bool>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => ProductPage(
-                            title: products[index]['title'],
-                            imageUrl: products[index]['image']),
-                      ),
-                    ).then((bool value){
-                      print(value);
-                      if(value){
+                onPressed: () => Navigator
+                        .pushNamed<bool>(
+                            context, '/product/' + index.toString())
+                        .then((bool value) {
+                      if (value) {
                         deleteProduct(index);
                       }
                     }),
@@ -39,17 +37,22 @@ class Products extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    Widget productCard = Center(
-      child: Text('No Products, Please add some'),
-    );
+  Widget _buildProductList() {
+    Widget productCards;
     if (products.length > 0) {
-      productCard = ListView.builder(
+      productCards = ListView.builder(
         itemBuilder: _buildProductItem,
         itemCount: products.length,
       );
+    } else {
+      productCards = Container();
     }
-    return productCard;
+    return productCards;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print('[Products Widget] build()');
+    return _buildProductList();
   }
 }
