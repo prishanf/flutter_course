@@ -68,7 +68,7 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
-    final targerWidth = deviceWidth >550.0 ? 500.0 : deviceWidth * 0.95;
+    final double targerWidth = deviceWidth >550.0 ? 500.0 : deviceWidth * 0.95;
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
