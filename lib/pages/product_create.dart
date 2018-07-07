@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 
 class ProductCreatePage extends StatefulWidget {
   final Function addProduct;
-  final Function deleteProduct;
 
-  ProductCreatePage(this.addProduct, this.deleteProduct);
+  ProductCreatePage(this.addProduct);
 
   @override
   State<StatefulWidget> createState() {
@@ -13,15 +12,13 @@ class ProductCreatePage extends StatefulWidget {
 }
 
 class _ProductCreatePageState extends State<ProductCreatePage> {
-  String _titleValue = '';
-  String _descriptionValue = '';
+  String _titleValue;
+  String _descriptionValue;
   double _priceValue;
 
   Widget _buildTitleTextField() {
     return TextField(
-      decoration: InputDecoration(
-        labelText: 'Product Title',
-      ),
+      decoration: InputDecoration(labelText: 'Product Title'),
       onChanged: (String value) {
         setState(() {
           _titleValue = value;
@@ -32,10 +29,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
 
   Widget _buildDescriptionTextField() {
     return TextField(
-      decoration: InputDecoration(
-        labelText: 'Product Description',
-      ),
       maxLines: 4,
+      decoration: InputDecoration(labelText: 'Product Description'),
       onChanged: (String value) {
         setState(() {
           _descriptionValue = value;
@@ -46,10 +41,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
 
   Widget _buildPriceTextField() {
     return TextField(
-      decoration: InputDecoration(
-        labelText: 'Product Price',
-      ),
       keyboardType: TextInputType.number,
+      decoration: InputDecoration(labelText: 'Product Price'),
       onChanged: (String value) {
         setState(() {
           _priceValue = double.parse(value);
@@ -66,7 +59,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       'image': 'assets/food.jpg'
     };
     widget.addProduct(product);
-    Navigator.pushReplacementNamed(context, '/proucts');
+    Navigator.pushReplacementNamed(context, '/products');
   }
 
   @override
@@ -79,14 +72,14 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
           _buildDescriptionTextField(),
           _buildPriceTextField(),
           SizedBox(
-            height: 15.0,
+            height: 10.0,
           ),
           RaisedButton(
             child: Text('Save'),
             color: Theme.of(context).accentColor,
             textColor: Colors.white,
             onPressed: _submitForm,
-          ),
+          )
         ],
       ),
     );
