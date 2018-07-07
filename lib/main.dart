@@ -43,8 +43,10 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
           brightness: Brightness.light,
           primarySwatch: Colors.deepOrange,
-          accentColor: Colors.deepPurple),
-      //home: AuthPage(),
+          accentColor: Colors.deepPurple,
+          buttonColor: Colors.deepPurple,
+          ),
+        //home: AuthPage(),
       routes: {
         '/': (BuildContext context) =>
             AuthPage(),
