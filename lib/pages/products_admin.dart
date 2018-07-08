@@ -53,7 +53,7 @@ class ProductsAdminPage extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          children: <Widget>[ProductEditPage(addProduct: addProduct), ProductListPage(products,updateProduct)],
+          children: <Widget>[ProductEditPage(addProduct: addProduct), ProductListPage(products,updateProduct,deleteProduct)],
         ),
       ),
     );
