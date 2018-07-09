@@ -2,8 +2,9 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../models/product.dart';
 
-class ProductsModel extends ScopedModel {
-  final List<Product> _products = [];
+class ProductsModel extends Model {
+  
+  List<Product> _products = [];
 
   List<Product> get products {
     return List.from(_products);
