@@ -1,0 +1,23 @@
+import 'package:scoped_model/scoped_model.dart';
+
+import '../models/product.dart';
+import '../models/user.dart';
+
+class ConnectedProducts extends Model {
+  List<Product> products = [];
+  User authenticatedUser;
+  int selProductIndex;
+
+  void addProduct(
+      String title, String description, double price, String image) {
+    final newProduct = Product(
+        title: title,
+        description: description,
+        image: image,
+        price: price,
+        userEmail: authenticatedUser.email,
+        userId: authenticatedUser.id);
+    products.add(newProduct);
+    selProductIndex = null;
+  }
+}
