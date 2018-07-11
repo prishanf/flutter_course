@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:scoped_model/scoped_model.dart';
+import 'package:http/http.dart' as http;
 
 import '../models/product.dart';
 import '../models/user.dart';
@@ -10,17 +13,32 @@ class ConnectedProductsModel extends Model {
 
   void addProduct(
       String title, String description, double price, String image) {
-    final newProduct = Product(
-        title: title,
-        description: description,
-        image: image,
-        price: price,
-        userEmail: _authenticatedUser.email,
-        userId: _authenticatedUser.id);
-    _products.add(newProduct);
+    final Map<String, dynamic> productData = {
+      'title': title,
+      'description': description,
+      'image':
+          'https://i.ndtvimg.com/i/2015-06/chocolate_625x350_81434346507.jpg',
+      'price': price
+    };
+
+    http
+        .post('https://pns-inventory-manager.firebaseio.com/products.json',
+            body: json.encode(productData))
+        .then((http.Response response) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      print(responseData);
+      final newProduct = Product(
+          id: responseData['name'],
+          title: title,
+          description: description,
+          image: image,
+          price: price,
+          userEmail: _authenticatedUser.email,
+          userId: _authenticatedUser.id);
+      _products.add(newProduct);
+    });
   }
 }
-
 
 class ProductsModel extends ConnectedProductsModel {
   bool _showFavorites = false;
@@ -55,8 +73,9 @@ class ProductsModel extends ConnectedProductsModel {
     products.add(product);
     selectedProductIndex = null;
   }*/
-  
-  void updateProduct( String title, String description, double price, String image) {
+
+  void updateProduct(
+      String title, String description, double price, String image) {
     final updateProduct = Product(
         title: title,
         description: description,
@@ -95,9 +114,6 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
   }
 }
-
-
-
 
 class UserModel extends ConnectedProductsModel {
   void login(String email, String password) {
