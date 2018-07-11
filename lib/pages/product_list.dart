@@ -50,7 +50,7 @@ class ProductListPage extends StatelessWidget {
                     leading: CircleAvatar(
                         backgroundImage:
                             AssetImage(model.allProducts[index].image)),
-                    title: Text(model.products[index].title),
+                    title: Text(model.allProducts[index].title),
                     subtitle: Text('\$${model.allProducts[index].price}'),
                     trailing: _buildEditButton(context, index, model),
                   ),

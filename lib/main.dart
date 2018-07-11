@@ -7,7 +7,6 @@ import './pages/auth.dart';
 import './pages/products_admin.dart';
 import './pages/products.dart';
 import './pages/product.dart';
-import './scoped-models/products.dart';
 import './scoped-models/main.dart';
 
 
