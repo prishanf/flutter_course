@@ -91,7 +91,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         _formData['description'],
         _formData['price'],
         _formData['image'],
-      );
+      ).then((_)=> Navigator.pushReplacementNamed(context, '/products').then((_)=>setSelectedProduct(null)));
     } else {
       print('update ');
       print(prod);
@@ -102,13 +102,12 @@ class _ProductEditPageState extends State<ProductEditPage> {
             _formData['image'],
           );
     }
-    Navigator.pushReplacementNamed(context, '/products').then((_)=>setSelectedProduct(null));
   }
 
   Widget _buildSubmitButton() {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        return RaisedButton(
+        return model.isLoading? Center(child: CircularProgressIndicator()) : RaisedButton(
           child: Text('Save'),
           textColor: Colors.white,
           onPressed: () => _submitForm(model.addProduct, model.updateProduct, model.selectProduct ,model.selectedProductIndex),

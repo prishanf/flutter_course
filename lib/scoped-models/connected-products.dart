@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
@@ -10,9 +11,12 @@ class ConnectedProductsModel extends Model {
   List<Product> _products = [];
   User _authenticatedUser;
   int _selProductIndex;
+  bool _isLoading = false;
 
-  void addProduct(
+  Future<Null> addProduct(
       String title, String description, double price, String image) {
+    _isLoading = true;
+    notifyListeners();
     final Map<String, dynamic> productData = {
       'title': title,
       'description': description,
@@ -23,7 +27,7 @@ class ConnectedProductsModel extends Model {
       'userId': _authenticatedUser.id
     };
 
-    http
+    return http
         .post('https://pns-inventory-manager.firebaseio.com/products.json',
             body: json.encode(productData))
         .then((http.Response response) {
@@ -38,6 +42,8 @@ class ConnectedProductsModel extends Model {
           userEmail: _authenticatedUser.email,
           userId: _authenticatedUser.id);
       _products.add(newProduct);
+      _isLoading = false;
+      notifyListeners();
     });
   }
 }
@@ -93,26 +99,29 @@ class ProductsModel extends ConnectedProductsModel {
   }
 
   void fetchPruducts() {
+    _isLoading = true;
+    notifyListeners();
     http
         .get("https://pns-inventory-manager.firebaseio.com/products.json")
         .then((http.Response response) {
       final List<Product> fetchedProductList = [];
       print((json.decode(response.body)));
-      final Map<String, dynamic> productListData =
-          json.decode(response.body);
-      productListData
-          .forEach((String productId, dynamic productData) {
-        final Product product = Product(
-            id: productId,
-            title: productData['title'],
-            description: productData['description'],
-            image: productData['image'],
-            price: productData['price'],
-            userEmail: productData['userEmail'],
-            userId: productData['userId']);
-        fetchedProductList.add(product);
-      });
-      _products = fetchedProductList;
+      final Map<String, dynamic> productListData = json.decode(response.body);
+      if (productListData != null) {
+        productListData.forEach((String productId, dynamic productData) {
+          final Product product = Product(
+              id: productId,
+              title: productData['title'],
+              description: productData['description'],
+              image: productData['image'],
+              price: productData['price'],
+              userEmail: productData['userEmail'],
+              userId: productData['userId']);
+          fetchedProductList.add(product);
+        });
+        _products = fetchedProductList;
+      }
+      _isLoading = false;
       notifyListeners();
     });
   }
@@ -145,5 +154,11 @@ class ProductsModel extends ConnectedProductsModel {
 class UserModel extends ConnectedProductsModel {
   void login(String email, String password) {
     _authenticatedUser = User(id: 'asdas', email: email, password: password);
+  }
+}
+
+class UtilityModel extends ConnectedProductsModel {
+  bool get isLoading {
+    return _isLoading;
   }
 }
