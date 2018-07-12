@@ -8,18 +8,18 @@ class ProductsPage extends StatefulWidget {
   MainModel model;
   ProductsPage(this.model);
   @override
-    State<StatefulWidget> createState() {
-      return _ProductsPageState();
-    }
+  State<StatefulWidget> createState() {
+    return _ProductsPageState();
+  }
 }
 
 class _ProductsPageState extends State<ProductsPage> {
   @override
-  initState(){
+  initState() {
     widget.model.fetchPruducts();
     super.initState();
   }
-   
+
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
       child: Column(
@@ -40,16 +40,18 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
-  Widget _buildProductsList(){
-    return ScopedModelDescendant(builder: (BuildContext context, Widget child, MainModel model){
-      Widget conent = Center(child:  Text('No Products Found'));
-      if(model.displayedProducts.length >0 && !model.isLoading){
+  Widget _buildProductsList() {
+    return ScopedModelDescendant(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        Widget conent = Center(child: Text('No Products Found'));
+        if (model.displayedProducts.length > 0 && !model.isLoading) {
           conent = Products();
-      }else if(model.isLoading){
-        conent = Center(child:CircularProgressIndicator());
-      }
-      return conent;
-    },);
+        } else if (model.isLoading) {
+          conent = Center(child: CircularProgressIndicator());
+        }
+        return conent;
+      },
+    );
   }
 
   @override

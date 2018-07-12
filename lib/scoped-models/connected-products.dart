@@ -82,16 +82,38 @@ class ProductsModel extends ConnectedProductsModel {
     selectedProductIndex = null;
   }*/
 
-  void updateProduct(
+  Future<Null> updateProduct(
       String title, String description, double price, String image) {
-    final updateProduct = Product(
-        title: title,
-        description: description,
-        image: image,
-        price: price,
-        userEmail: _authenticatedUser.email,
-        userId: _authenticatedUser.id);
-    _products[_selProductIndex] = updateProduct;
+        _isLoading = true;
+    final Map<String, dynamic> updateData = {
+      'title': title,
+      'description': description,
+      'image':
+          'https://i.ndtvimg.com/i/2015-06/chocolate_625x350_81434346507.jpg',
+      'price': price,
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id
+    };
+    print('before http call');
+    print(updateData);
+    
+   return http
+        .put(
+            'https://pns-inventory-manager.firebaseio.com/products/${selectedProduct.id}.json',
+            body: json.encode(updateData))
+        .then((http.Response response) {
+          _isLoading = false;
+          final updateProduct = Product(
+              id: selectedProduct.id,
+              title: title,
+              description: description,
+              image: image,
+              price: price,
+              userEmail: _authenticatedUser.email,
+              userId: _authenticatedUser.id);
+          _products[_selProductIndex] = updateProduct;
+          notifyListeners();
+    });
   }
 
   void deleteProduct() {
