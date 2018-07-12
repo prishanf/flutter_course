@@ -48,10 +48,10 @@ class ProductCard extends StatelessWidget {
                   : Icons.favorite_border),
               color: Colors.red,
               onPressed: () {
-                    print('favorite pressed');
-                    model.selectProduct(productIndex);
-                    model.toggleProductFavoriteStatus();
-                  },
+                print('favorite pressed');
+                model.selectProduct(productIndex);
+                model.toggleProductFavoriteStatus();
+              },
             );
           },
         )
@@ -64,7 +64,7 @@ class ProductCard extends StatelessWidget {
     return Card(
       child: Column(
         children: <Widget>[
-          Image.asset(product.image),
+          Image.network(product.image),
           _buildTitlePriceRow(),
           AddressTag('Union Square, San Francisco'),
           Text(product.userEmail),

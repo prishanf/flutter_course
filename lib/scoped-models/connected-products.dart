@@ -18,7 +18,9 @@ class ConnectedProductsModel extends Model {
       'description': description,
       'image':
           'https://i.ndtvimg.com/i/2015-06/chocolate_625x350_81434346507.jpg',
-      'price': price
+      'price': price,
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id
     };
 
     http
@@ -88,6 +90,31 @@ class ProductsModel extends ConnectedProductsModel {
 
   void deleteProduct() {
     _products.removeAt(_selProductIndex);
+  }
+
+  void fetchPruducts() {
+    http
+        .get("https://pns-inventory-manager.firebaseio.com/products.json")
+        .then((http.Response response) {
+      final List<Product> fetchedProductList = [];
+      print((json.decode(response.body)));
+      final Map<String, dynamic> productListData =
+          json.decode(response.body);
+      productListData
+          .forEach((String productId, dynamic productData) {
+        final Product product = Product(
+            id: productId,
+            title: productData['title'],
+            description: productData['description'],
+            image: productData['image'],
+            price: productData['price'],
+            userEmail: productData['userEmail'],
+            userId: productData['userId']);
+        fetchedProductList.add(product);
+      });
+      _products = fetchedProductList;
+      notifyListeners();
+    });
   }
 
   void toggleProductFavoriteStatus() {
