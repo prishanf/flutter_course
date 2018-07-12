@@ -132,10 +132,10 @@ class ProductsModel extends ConnectedProductsModel {
     });
   }
 
-  void fetchPruducts() {
+  Future<Null> fetchPruducts() {
     _isLoading = true;
     notifyListeners();
-    http
+   return http
         .get("https://pns-inventory-manager.firebaseio.com/products.json")
         .then((http.Response response) {
       final List<Product> fetchedProductList = [];
