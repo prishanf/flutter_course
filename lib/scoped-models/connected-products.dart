@@ -84,7 +84,7 @@ class ProductsModel extends ConnectedProductsModel {
 
   Future<Null> updateProduct(
       String title, String description, double price, String image) {
-        _isLoading = true;
+    _isLoading = true;
     final Map<String, dynamic> updateData = {
       'title': title,
       'description': description,
@@ -96,28 +96,40 @@ class ProductsModel extends ConnectedProductsModel {
     };
     print('before http call');
     print(updateData);
-    
-   return http
+
+    return http
         .put(
             'https://pns-inventory-manager.firebaseio.com/products/${selectedProduct.id}.json',
             body: json.encode(updateData))
         .then((http.Response response) {
-          _isLoading = false;
-          final updateProduct = Product(
-              id: selectedProduct.id,
-              title: title,
-              description: description,
-              image: image,
-              price: price,
-              userEmail: _authenticatedUser.email,
-              userId: _authenticatedUser.id);
-          _products[_selProductIndex] = updateProduct;
-          notifyListeners();
+      _isLoading = false;
+      final updateProduct = Product(
+          id: selectedProduct.id,
+          title: title,
+          description: description,
+          image: image,
+          price: price,
+          userEmail: _authenticatedUser.email,
+          userId: _authenticatedUser.id);
+      _products[_selProductIndex] = updateProduct;
+      notifyListeners();
     });
   }
 
-  void deleteProduct() {
+  Future<Null> deleteProduct() {
+    _isLoading = true;
+    final deletedProduct = selectedProduct.id;
     _products.removeAt(_selProductIndex);
+    _selProductIndex = null;
+       notifyListeners();
+    return http
+        .delete(
+      'https://pns-inventory-manager.firebaseio.com/products/${deletedProduct}.json',
+    )
+    .then((http.Response response) {
+    _isLoading = false;
+    notifyListeners();
+    });
   }
 
   void fetchPruducts() {

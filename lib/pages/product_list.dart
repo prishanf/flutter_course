@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
+
 import 'package:scoped_model/scoped_model.dart';
 
 import './product_edit.dart';
 import '../scoped-models/main.dart';
 
 class ProductListPage extends StatefulWidget {
+  final MainModel model;
 
-  MainModel model;
   ProductListPage(this.model);
-  @override
-    State<StatefulWidget> createState() {
-      // TODO: implement createState
-      return _ProductListPageState();
-    }
-}
-class _ProductListPageState extends State<ProductListPage>{
 
-@override
-  initState(){
+  @override
+  State<StatefulWidget> createState() {
+    return _ProductListPageState();
+  }
+}
+
+class _ProductListPageState extends State<ProductListPage> {
+  @override
+  initState() {
     widget.model.fetchPruducts();
     super.initState();
   }
+
   Widget _buildEditButton(BuildContext context, int index, MainModel model) {
     return IconButton(
       icon: Icon(Icons.edit),
@@ -32,9 +34,8 @@ class _ProductListPageState extends State<ProductListPage>{
               return ProductEditPage();
             },
           ),
-        ).then((_) {
-          model.selectProduct(null);
-        });
+        );
+       
       },
     );
   }
