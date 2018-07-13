@@ -178,7 +178,9 @@ class _AuthPageState extends State<AuthPage> {
                     ScopedModelDescendant<MainModel>(
                       builder: (BuildContext context, Widget child,
                           MainModel model) {
-                        return RaisedButton(
+                        return model.isLoading ? 
+                        CircularProgressIndicator() : 
+                        RaisedButton(
                           textColor: Colors.white,
                           child: Text('LOGIN'),
                           onPressed: () =>

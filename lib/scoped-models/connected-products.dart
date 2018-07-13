@@ -230,6 +230,8 @@ class UserModel extends ConnectedProductsModel {
   }
 
   Future<Map<String, dynamic>> signup(String email, String password) async {
+    _isLoading =true;
+    notifyListeners();
     String apiKey = 'AIzaSyA3LJnT-daYPmoyuQ5eBXeoXrxsZU-7LoQ';
     String endpoint =
         'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${apiKey}';
@@ -249,7 +251,9 @@ class UserModel extends ConnectedProductsModel {
       message = 'Authentication succeeded!';
     } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
       message = 'This email already exists';
-    } 
+    }
+     _isLoading =false;
+    notifyListeners(); 
     return {'success': !hasError, 'message': message};
   }
 }
