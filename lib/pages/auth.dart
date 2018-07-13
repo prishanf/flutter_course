@@ -54,7 +54,7 @@ class _AuthPageState extends State<AuthPage> {
 
   Widget _buildPasswordConfirmTextField() {
     return TextFormField(
-      initialValue: 'a@c.comqwqwe',
+      initialValue: 'Teshan8*',
       decoration: InputDecoration(
           labelText: 'Confirm Password', filled: true, fillColor: Colors.white),
       obscureText: true,
@@ -63,7 +63,7 @@ class _AuthPageState extends State<AuthPage> {
           return 'Passwords do not match';
         }
       },
-   );
+    );
   }
 
   Widget _buildPasswordTextField() {
@@ -108,6 +108,18 @@ class _AuthPageState extends State<AuthPage> {
           await signup(_formData['email'], _formData['password']);
       if (successInformatoin['success']) {
         Navigator.pushReplacementNamed(context, '/products');
+      } else {
+        showDialog(context: context, builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('An Error Occurred!'),
+            content: Text( successInformatoin['message']),
+            actions: <Widget>[
+              FlatButton(child: Text('Okay'),onPressed: (){
+                Navigator.of(context).pop();
+              },)
+            ],
+          );
+        });
       }
     }
     //Navigator.pushReplacementNamed(context, '/products');

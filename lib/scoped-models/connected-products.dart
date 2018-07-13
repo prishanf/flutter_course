@@ -240,10 +240,17 @@ class UserModel extends ConnectedProductsModel {
     };
     Map<String, String> headers = {'Content-Type': 'application/json'};
     http.Response response = await http.post(endpoint,
-        body: json.encode(authData),
-        headers: headers);
-    print(json.decode(response.body));
-    return {'success': true, 'message': 'Auth Scuccess'};
+        body: json.encode(authData), headers: headers);
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    bool hasError = true;
+    String message = 'Something Went wrong';
+    if (responseData.containsKey('idToken')) {
+      hasError = false;
+      message = 'Authentication succeeded!';
+    } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
+      message = 'This email already exists';
+    } 
+    return {'success': !hasError, 'message': message};
   }
 }
 
