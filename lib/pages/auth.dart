@@ -63,10 +63,7 @@ class _AuthPageState extends State<AuthPage> {
           return 'Passwords do not match';
         }
       },
-      onSaved: (String value) {
-        // _formData['email'] = value;
-      },
-    );
+   );
   }
 
   Widget _buildPasswordTextField() {
@@ -98,14 +95,22 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _submitForm(Function login) {
+  void _submitForm(Function login, Function signup) async {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
     _formKey.currentState.save();
     print(_formData);
-    login(_formData['email'], _formData['password']);
-    Navigator.pushReplacementNamed(context, '/products');
+    if (_authMode == AuthMode.Login) {
+      login(_formData['email'], _formData['password']);
+    } else {
+      final Map<String, dynamic> successInformatoin =
+          await signup(_formData['email'], _formData['password']);
+      if (successInformatoin['success']) {
+        Navigator.pushReplacementNamed(context, '/products');
+      }
+    }
+    //Navigator.pushReplacementNamed(context, '/products');
   }
 
   @override
@@ -164,7 +169,8 @@ class _AuthPageState extends State<AuthPage> {
                         return RaisedButton(
                           textColor: Colors.white,
                           child: Text('LOGIN'),
-                          onPressed: () => _submitForm(model.login),
+                          onPressed: () =>
+                              _submitForm(model.login, model.signup),
                         );
                       },
                     )
