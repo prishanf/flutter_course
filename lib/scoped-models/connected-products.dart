@@ -10,10 +10,10 @@ import '../models/user.dart';
 class ConnectedProductsModel extends Model {
   List<Product> _products = [];
   User _authenticatedUser;
-  int _selProductIndex;
+  String _selProductId;
   bool _isLoading = false;
 
-  Future<Null> addProduct(
+  Future<bool> addProduct(
       String title, String description, double price, String image) {
     _isLoading = true;
     notifyListeners();
@@ -28,9 +28,14 @@ class ConnectedProductsModel extends Model {
     };
 
     return http
-        .post('https://pns-inventory-manager.firebaseio.com/products.json',
+        .post('https://pns-inventory-manager.firebaseio.com/products',
             body: json.encode(productData))
         .then((http.Response response) {
+      if(response.statusCode !=200 && response.statusCode!=201){
+         _isLoading = false;
+         notifyListeners();
+        return false;
+      }    
       final Map<String, dynamic> responseData = json.decode(response.body);
       print(responseData);
       final newProduct = Product(
@@ -44,6 +49,7 @@ class ConnectedProductsModel extends Model {
       _products.add(newProduct);
       _isLoading = false;
       notifyListeners();
+      return true;
     });
   }
 }
@@ -63,7 +69,13 @@ class ProductsModel extends ConnectedProductsModel {
   }
 
   int get selectedProductIndex {
-    return _selProductIndex;
+     return _products.indexWhere((Product product){
+          return product.id == _selProductId;
+     });
+  }
+
+  String get selectedProductId{
+    return _selProductId;
   }
 
   bool get displayFavoritesOnly {
@@ -71,10 +83,12 @@ class ProductsModel extends ConnectedProductsModel {
   }
 
   Product get selectedProduct {
-    if (_selProductIndex == null) {
+    if (_selProductId == null) {
       return null;
     }
-    return _products[_selProductIndex];
+    return _products.firstWhere((Product product){
+      return product.id == _selProductId;
+    });
   }
 
 /*void addProduct(Product product) {
@@ -111,7 +125,7 @@ class ProductsModel extends ConnectedProductsModel {
           price: price,
           userEmail: _authenticatedUser.email,
           userId: _authenticatedUser.id);
-      _products[_selProductIndex] = updateProduct;
+      _products[selectedProductIndex] = updateProduct;
       notifyListeners();
     });
   }
@@ -119,23 +133,23 @@ class ProductsModel extends ConnectedProductsModel {
   Future<Null> deleteProduct() {
     _isLoading = true;
     final deletedProduct = selectedProduct.id;
-    _products.removeAt(_selProductIndex);
-    _selProductIndex = null;
-       notifyListeners();
+    _products.removeAt(selectedProductIndex);
+    _selProductId = null;
+    notifyListeners();
     return http
         .delete(
       'https://pns-inventory-manager.firebaseio.com/products/${deletedProduct}.json',
     )
-    .then((http.Response response) {
-    _isLoading = false;
-    notifyListeners();
+        .then((http.Response response) {
+      _isLoading = false;
+      notifyListeners();
     });
   }
 
   Future<Null> fetchPruducts() {
     _isLoading = true;
     notifyListeners();
-   return http
+    return http
         .get("https://pns-inventory-manager.firebaseio.com/products.json")
         .then((http.Response response) {
       final List<Product> fetchedProductList = [];
@@ -157,13 +171,15 @@ class ProductsModel extends ConnectedProductsModel {
       }
       _isLoading = false;
       notifyListeners();
+      //_selProductId = null;
     });
   }
 
   void toggleProductFavoriteStatus() {
-    final bool isCurrentlyFavorite = _products[_selProductIndex].isFavorite;
+    final bool isCurrentlyFavorite = _products[selectedProductIndex].isFavorite;
     final bool newFavouriteStatus = !isCurrentlyFavorite;
     final Product updateProduct = Product(
+        id: selectedProduct.id,
         title: selectedProduct.title,
         description: selectedProduct.description,
         price: selectedProduct.price,
@@ -171,12 +187,13 @@ class ProductsModel extends ConnectedProductsModel {
         userEmail: selectedProduct.userEmail,
         userId: selectedProduct.userId,
         isFavorite: newFavouriteStatus);
-    _products[_selProductIndex] = updateProduct;
+    _products[selectedProductIndex] = updateProduct;
     notifyListeners();
   }
 
-  void selectProduct(int index) {
-    _selProductIndex = index;
+  void selectProduct(String productId) {
+    _selProductId = productId;
+    notifyListeners();
   }
 
   void toggleDisplayMode() {
