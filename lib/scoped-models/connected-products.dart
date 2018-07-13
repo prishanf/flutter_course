@@ -31,11 +31,11 @@ class ConnectedProductsModel extends Model {
         .post('https://pns-inventory-manager.firebaseio.com/products',
             body: json.encode(productData))
         .then((http.Response response) {
-      if(response.statusCode !=200 && response.statusCode!=201){
-         _isLoading = false;
-         notifyListeners();
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
         return false;
-      }    
+      }
       final Map<String, dynamic> responseData = json.decode(response.body);
       print(responseData);
       final newProduct = Product(
@@ -50,7 +50,12 @@ class ConnectedProductsModel extends Model {
       _isLoading = false;
       notifyListeners();
       return true;
+    }).catchError((errror) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
+    ;
   }
 }
 
@@ -69,12 +74,12 @@ class ProductsModel extends ConnectedProductsModel {
   }
 
   int get selectedProductIndex {
-     return _products.indexWhere((Product product){
-          return product.id == _selProductId;
-     });
+    return _products.indexWhere((Product product) {
+      return product.id == _selProductId;
+    });
   }
 
-  String get selectedProductId{
+  String get selectedProductId {
     return _selProductId;
   }
 
@@ -86,7 +91,7 @@ class ProductsModel extends ConnectedProductsModel {
     if (_selProductId == null) {
       return null;
     }
-    return _products.firstWhere((Product product){
+    return _products.firstWhere((Product product) {
       return product.id == _selProductId;
     });
   }
@@ -127,10 +132,14 @@ class ProductsModel extends ConnectedProductsModel {
           userId: _authenticatedUser.id);
       _products[selectedProductIndex] = updateProduct;
       notifyListeners();
+    }).catchError((errror) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 
-  Future<Null> deleteProduct() {
+  Future<bool> deleteProduct() {
     _isLoading = true;
     final deletedProduct = selectedProduct.id;
     _products.removeAt(selectedProductIndex);
@@ -143,6 +152,11 @@ class ProductsModel extends ConnectedProductsModel {
         .then((http.Response response) {
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((errror) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 
@@ -151,7 +165,7 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
     return http
         .get("https://pns-inventory-manager.firebaseio.com/products.json")
-        .then((http.Response response) {
+        .then<Null>((http.Response response) {
       final List<Product> fetchedProductList = [];
       print((json.decode(response.body)));
       final Map<String, dynamic> productListData = json.decode(response.body);
@@ -172,6 +186,10 @@ class ProductsModel extends ConnectedProductsModel {
       _isLoading = false;
       notifyListeners();
       //_selProductId = null;
+    }).catchError((errror) {
+      _isLoading = false;
+      notifyListeners();
+      return;
     });
   }
 
