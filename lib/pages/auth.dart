@@ -4,7 +4,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../scoped-models/main.dart';
 
-enum AuthMode { Signup, Login }
+import '../models/auth.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -95,20 +95,17 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _submitForm(Function login, Function signup) async {
+  void _submitForm(Function authenticate) async {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) {
       return;
     }
     _formKey.currentState.save();
     print(_formData);
     Map<String, dynamic> successInformatoin;
-    if (_authMode == AuthMode.Login) {
-      successInformatoin =
-          await login(_formData['email'], _formData['password']);
-    } else {
-      successInformatoin =
-          await signup(_formData['email'], _formData['password']);
-    }
+
+    successInformatoin = await authenticate(
+        _formData['email'], _formData['password'], _authMode);
+
     if (successInformatoin['success']) {
       Navigator.pushReplacementNamed(context, '/products');
     } else {
@@ -192,7 +189,7 @@ class _AuthPageState extends State<AuthPage> {
                                 textColor: Colors.white,
                                 child: Text('LOGIN'),
                                 onPressed: () =>
-                                    _submitForm(model.login, model.signup),
+                                    _submitForm(model.authenticate),
                               );
                       },
                     )

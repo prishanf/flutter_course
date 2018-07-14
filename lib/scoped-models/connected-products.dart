@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/product.dart';
 import '../models/user.dart';
+import '../models/auth.dart';
 
 class ConnectedProductsModel extends Model {
   List<Product> _products = [];
@@ -227,61 +228,47 @@ class ProductsModel extends ConnectedProductsModel {
 class UserModel extends ConnectedProductsModel {
   final String apiKey = 'AIzaSyA3LJnT-daYPmoyuQ5eBXeoXrxsZU-7LoQ';
   final Map<String, String> headers = {'Content-Type': 'application/json'};
-  
-  Future<Map<String, dynamic>> login(String email, String password) async {
-   _isLoading =true;
-    notifyListeners();  
+
+  Future<Map<String, dynamic>> authenticate(String email, String password,
+      [AuthMode mode = AuthMode.Login]) async {
+    _isLoading = true;
+    notifyListeners();
     String endpoint =
         'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${apiKey}';
     Map<String, dynamic> authData = {
       'email': email,
       'password': password,
       'returnSecureToken': true
-    }; 
-    
-    http.Response response = await http.post(endpoint,
-        body: json.encode(authData), headers: headers);
-
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    bool hasError = true;
-    String message = 'Something Went wrong'; 
-
-    if (responseData.containsKey('idToken')) {
-      hasError = false;
-      message = 'Authentication succeeded!';
-      _authenticatedUser = User(id: responseData['idToken'], email: responseData['email'], password: password);
-    } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND' || responseData['error']['message']=='INVALID_PASSWORD' ) {
-      message = 'Invalid email or password!';
-    }
-     _isLoading =false;
-    notifyListeners(); 
-    return {'success': !hasError, 'message': message};
-  }
-
-  Future<Map<String, dynamic>> signup(String email, String password) async {
-    _isLoading =true;
-    notifyListeners();
-    String apiKey = 'AIzaSyA3LJnT-daYPmoyuQ5eBXeoXrxsZU-7LoQ';
-    String endpoint =
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${apiKey}';
-    Map<String, dynamic> authData = {
-      'email': email,
-      'password': password,
-      'returnSecureToken': true
     };
-    http.Response response = await http.post(endpoint,
-        body: json.encode(authData), headers: headers);
+    http.Response response;
+    if (mode == AuthMode.Login) {
+      response = await http.post(endpoint,
+          body: json.encode(authData), headers: headers);
+    } else {
+      response = await http.post(endpoint,
+          body: json.encode(authData), headers: headers);
+    }
+
     final Map<String, dynamic> responseData = json.decode(response.body);
     bool hasError = true;
     String message = 'Something Went wrong';
+
     if (responseData.containsKey('idToken')) {
       hasError = false;
       message = 'Authentication succeeded!';
+      _authenticatedUser = User(
+          id: responseData['idToken'],
+          email: responseData['email'],
+          password: password);
     } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
       message = 'This email already exists';
+    } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
+      message = 'Invalid password!';
+    } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
+      message = 'Invalid email!';
     }
-     _isLoading =false;
-    notifyListeners(); 
+    _isLoading = false;
+    notifyListeners();
     return {'success': !hasError, 'message': message};
   }
 }
