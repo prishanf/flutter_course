@@ -106,7 +106,7 @@ class ProductsModel extends ConnectedProductsModel {
     selectedProductIndex = null;
   }*/
 
-  Future<Null> updateProduct(
+  Future<bool> updateProduct(
       String title, String description, double price, String image) {
     _isLoading = true;
     final Map<String, dynamic> updateData = {
@@ -137,6 +137,7 @@ class ProductsModel extends ConnectedProductsModel {
           userId: _authenticatedUser.id);
       _products[selectedProductIndex] = updateProduct;
       notifyListeners();
+      return true;
     }).catchError((errror) {
       _isLoading = false;
       notifyListeners();
@@ -170,11 +171,11 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
-
     };
 
     return http
-        .get("https://pns-inventory-manager.firebaseio.com/products.json?auth=${_authenticatedUser.token}")
+        .get(
+            "https://pns-inventory-manager.firebaseio.com/products.json?auth=${_authenticatedUser.token}")
         .then<Null>((http.Response response) {
       final List<Product> fetchedProductList = [];
       print((json.decode(response.body)));
