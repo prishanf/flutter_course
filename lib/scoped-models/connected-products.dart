@@ -29,7 +29,7 @@ class ConnectedProductsModel extends Model {
     };
     try {
       final http.Response response = await http.post(
-          'https://pns-inventory-manager.firebaseio.com/products.json',
+          'https://pns-inventory-manager.firebaseio.com/products.json?auth=${_authenticatedUser.token}',
           body: json.encode(productData));
       if (response.statusCode != 200 && response.statusCode != 201) {
         _isLoading = false;
@@ -123,7 +123,7 @@ class ProductsModel extends ConnectedProductsModel {
 
     return http
         .put(
-            'https://pns-inventory-manager.firebaseio.com/products/${selectedProduct.id}.json',
+            'https://pns-inventory-manager.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
             body: json.encode(updateData))
         .then((http.Response response) {
       _isLoading = false;
@@ -152,7 +152,7 @@ class ProductsModel extends ConnectedProductsModel {
     notifyListeners();
     return http
         .delete(
-      'https://pns-inventory-manager.firebaseio.com/products/${deletedProduct}.json',
+      'https://pns-inventory-manager.firebaseio.com/products/${deletedProduct}.json?auth=${_authenticatedUser.token}',
     )
         .then((http.Response response) {
       _isLoading = false;
@@ -168,8 +168,13 @@ class ProductsModel extends ConnectedProductsModel {
   Future<Null> fetchPruducts() {
     _isLoading = true;
     notifyListeners();
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+
+    };
+
     return http
-        .get("https://pns-inventory-manager.firebaseio.com/products.json")
+        .get("https://pns-inventory-manager.firebaseio.com/products.json?auth=${_authenticatedUser.token}")
         .then<Null>((http.Response response) {
       final List<Product> fetchedProductList = [];
       print((json.decode(response.body)));
@@ -257,9 +262,9 @@ class UserModel extends ConnectedProductsModel {
       hasError = false;
       message = 'Authentication succeeded!';
       _authenticatedUser = User(
-          id: responseData['idToken'],
+          id: responseData['localId'],
           email: responseData['email'],
-          password: password);
+          token: responseData['idToken']);
     } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
       message = 'This email already exists';
     } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
